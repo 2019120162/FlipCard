@@ -1,0 +1,137 @@
+body {
+  background-color: #f0f2f5;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 2rem;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+form {
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+}
+
+input[type="text"] {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 200px;
+  padding: .6rem 1rem;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 2px #0000000d;
+}
+
+button {
+  color: #fff;
+  cursor: pointer;
+  background-color: #005ce6;
+  border: none;
+  border-radius: 8px;
+  padding: .5rem 1rem;
+  transition: background .2s, transform .1s;
+}
+
+button:hover {
+  background-color: #0041b3;
+  transform: scale(1.03);
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 500px;
+  margin-bottom: 1rem;
+  padding: 1.2rem;
+  box-shadow: 0 4px 10px #00000014;
+}
+
+.card-actions {
+  gap: .5rem;
+  margin-top: 1rem;
+  display: flex;
+}
+
+.study-container {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
+  display: flex;
+}
+
+.card-flip {
+  perspective: 1000px;
+  width: 400px;
+  height: 250px;
+  margin-bottom: 20px;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .6s;
+  position: relative;
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  backface-visibility: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  background-color: #fff;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  font-size: 1.4rem;
+  transition: opacity .3s ease-in-out;
+  display: flex;
+  position: absolute;
+  box-shadow: 0 6px 15px #0000001a;
+}
+
+.card-front {
+  z-index: 2;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+.study-button {
+  color: #fff;
+  cursor: pointer;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color .2s;
+}
+
+.study-button:hover {
+  background-color: #1e40af;
+}
+/*# sourceMappingURL=flashcards-app-final.4d663569.css.map */

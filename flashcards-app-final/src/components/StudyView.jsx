@@ -12,13 +12,15 @@ export default function StudyView({ cards }) {
   };
 
   return (
-    <div className="study-card">
-      <div className="study-card-box" onClick={() => setFlipped(!flipped)}>
-        {flipped ? cards[index].back : cards[index].front}
-      </div>
-      <div>
-        <button onClick={next} style={{ marginTop: "10px" }}>Next</button>
-      </div>
+    <div className="study-container">
+  <button className="study-button" onClick={next}>Next</button>
+
+  <div className="card-flip" onClick={() => setFlipped(!flipped)}>
+    <div className={`card-inner ${flipped ? 'flipped' : ''}`}>
+      <div className="card-front">{cards[index].front}</div>
+      <div className="card-back">{cards[index].back}</div>
     </div>
+  </div>
+</div>
   );
 }

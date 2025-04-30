@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Flashcards</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>All Flashcards</h1>
+    <label for="sort">Sort by: </label>
+    <select id="sort">
+      <option value="date">Date Added</option>
+      <option value="question">Question (A-Z)</option>
+      <option value="custom">Custom Order</option>
+    </select>
+    <ul id="flashcardList" class="card-list"></ul>
+    <a href="add.html">Add New</a> | <a href="study.html">Study</a>
+  </main>
+  <script src="view.js"></script>
+</body>
+</html>

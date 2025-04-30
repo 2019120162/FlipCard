@@ -1,45 +1,46 @@
-let cards = [];
+const cards = [
+  { question: "What is the capital of France?", answer: "Paris" },
+  { question: "What is 2 + 2?", answer: "4" },
+  { question: "What is the boiling point of water?", answer: "100°C" },
+];
+
 let current = 0;
-let flipped = false;
 
 const cardEl = document.getElementById("card");
-const prevBtn = document.getElementById("prev");
-const nextBtn = document.getElementById("next");
-const flipBtn = document.getElementById("flip");
-
-async function fetchCards() {
-  const res = await fetch("/api/flashcards");
-  cards = await res.json();
-  showCard();
-}
+const cardFront = document.getElementById("card-front");
+const cardBack = document.getElementById("card-back");
+const flipBtn = document.getElementById("flipBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
 function showCard() {
   if (cards.length === 0) {
-    cardEl.textContent = "No cards available.";
+    cardFront.textContent = "No cards available.";
+    cardBack.textContent = "";
     return;
   }
   const { question, answer } = cards[current];
-  cardEl.textContent = flipped ? answer : question;
+  cardFront.textContent = question;
+  cardBack.textContent = answer;
+  cardEl.classList.remove("flipped");
 }
 
+flipBtn.addEventListener("click", () => {
+  cardEl.classList.toggle("flipped");
+});
+
 prevBtn.addEventListener("click", () => {
-  if (cards.length === 0) return;
-  current = (current - 1 + cards.length) % cards.length;
-  flipped = false;
-  showCard();
+  if (current > 0) {
+    current--;
+    showCard();
+  }
 });
 
 nextBtn.addEventListener("click", () => {
-  if (cards.length === 0) return;
-  current = (current + 1) % cards.length;
-  flipped = false;
-  showCard();
+  if (current < cards.length - 1) {
+    current++;
+    showCard();
+  }
 });
 
-flipBtn.addEventListener("click", () => {
-  if (cards.length === 0) return;
-  flipped = !flipped;
-  showCard();
-});
-
-fetchCards();
+showCard();

@@ -2,19 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Flashcard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Add New Flashcard</h1>
-    <form id="addForm" class="card-form">
-      <input type="text" placeholder="Question" name="question" required />
-      <textarea placeholder="Answer" name="answer" required></textarea>
-      <button type="submit">Add Card</button>
+  <div class="container">
+    <h2>Add a New Flashcard</h2>
+
+    <form id="addForm">
+      <div style="margin-bottom: 1rem;">
+        <input type="text" id="question" placeholder="Enter question" required style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <input type="text" id="answer" placeholder="Enter answer" required style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
+      </div>
+      <button type="submit">Add Flashcard</button>
     </form>
-    <a href="view.html">View All</a> | <a href="study.html">Study</a>
-  </main>
-  <script src="add.js"></script>
+
+    <div style="margin-top: 1.5rem;">
+      <a href="index.html">Back to Home</a> | <a href="view.html">View Flashcards</a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('addForm');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const question = document.getElementById('question').value.trim();
+      const answer = document.getElementById('answer').value.trim();
+
+      if (!question || !answer) return;
+
+      const flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+      flashcards.push({ question, answer });
+      localStorage.setItem('flashcards', JSON.stringify(flashcards));
+
+      alert('Flashcard added successfully!');
+      form.reset();
+    });
+  </script>
 </body>
 </html>

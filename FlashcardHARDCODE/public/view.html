@@ -1,22 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>View Flashcards</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Flashcards</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="container">
-    <h1>All Flashcards</h1>
-    <label for="sort">Sort by: </label>
-    <select id="sort">
-      <option value="date">Date Added</option>
-      <option value="question">Question (A-Z)</option>
-      <option value="custom">Custom Order</option>
-    </select>
-    <ul id="flashcardList" class="card-list"></ul>
-    <a href="add.html">Add New</a> | <a href="study.html">Study</a>
-  </main>
-  <script src="view.js"></script>
+  <div class="container">
+    <h2>All Flashcards</h2>
+
+    <div class="sort-section">
+      <label for="sortSelect">Sort by:</label>
+      <select id="sortSelect">
+        <option value="date">Date Added</option>
+        <option value="question">Question (A-Z)</option>
+        <option value="custom">Custom Order</option>
+      </select>
+    </div>
+
+    <div class="flashcard-list" id="flashcardList"></div>
+
+    <div style="margin-top: 1.5rem;">
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+
+      const listEl = document.getElementById('flashcardList');
+      const sortEl = document.getElementById('sortSelect');
+
+      function render(cards) {
+        listEl.innerHTML = '';
+        cards.forEach((c, i) => {
+          const div = document.createElement('div');
+          div.className = 'flashcard-item';
+          div.innerHTML = `<h3>${c.question}</h3><p>${c.answer}</p>`;
+          listEl.appendChild(div);
+        });
+      }
+
+      function sortAndRender() {
+        const mode = sortEl.value;
+        let sorted = [...flashcards];
+
+        if (mode === 'question') {
+          sorted.sort((a, b) => a.question.localeCompare(b.question));
+        } else if (mode === 'custom') {
+          // assume you’ve been updating position in localStorage if you allow reordering
+          sorted.sort((a, b) => (a.position || 0) - (b.position || 0));
+        } else {
+          // date: newest first (we saved no timestamp in localStorage, so fall back to insertion order)
+          sorted = flashcards.slice().reverse();
+        }
+
+        render(sorted);
+      }
+
+      sortEl.addEventListener('change', sortAndRender);
+      sortAndRender();
+    });
+  </script>
 </body>
 </html>

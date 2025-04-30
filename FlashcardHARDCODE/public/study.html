@@ -2,20 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Study Flashcards</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Study</h1>
-    <div class="flashcard" id="card"></div>
-    <div class="nav-buttons">
-      <button id="prev">Previous</button>
-      <button id="flip">Flip</button>
-      <button id="next">Next</button>
+  <div class="container">
+    <h2>Study Mode</h2>
+    <div class="flashcard">
+      <div class="card-inner" id="cardInner">
+        <div class="card-front" id="cardFront"></div>
+        <div class="card-back" id="cardBack"></div>
+      </div>
     </div>
-    <a href="add.html">Add New</a> | <a href="view.html">View All</a>
-  </main>
-  <script src="study.js"></script>
+    <div class="buttons">
+      <button id="prevBtn">Previous</button>
+      <button id="flipBtn">Flip</button>
+      <button id="nextBtn">Next</button>
+    </div>
+    <div style="margin-top: 1rem;">
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    const flashcards = JSON.parse(localStorage.getItem("flashcards")) || [
+      { question: "What is TCP?", answer: "Transmission Control Protocol" },
+      { question: "What is UDP?", answer: "User Datagram Protocol" },
+      { question: "What does HTTP stand for?", answer: "HyperText Transfer Protocol" },
+    ];
+
+    let currentIndex = 0;
+    let flipped = false;
+
+    const card = document.querySelector(".flashcard");
+    const front = document.getElementById("cardFront");
+    const back = document.getElementById("cardBack");
+    const cardInner = document.getElementById("cardInner");
+
+    function showCard(index) {
+      front.textContent = flashcards[index].question;
+      back.textContent = flashcards[index].answer;
+      flipped = false;
+      card.classList.remove("flipped");
+    }
+
+    document.getElementById("flipBtn").addEventListener("click", () => {
+      flipped = !flipped;
+      card.classList.toggle("flipped");
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % flashcards.length;
+      showCard(currentIndex);
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      showCard(currentIndex);
+    });
+
+    // Initialize
+    showCard(currentIndex);
+  </script>
 </body>
 </html>

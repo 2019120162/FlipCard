@@ -28,36 +28,107 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // load base array
       let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
 
-      const listEl = document.getElementById('flashcardList');
-      const sortEl = document.getElementById('sortSelect');
+      const listEl   = document.getElementById('flashcardList');
+      const sortEl   = document.getElementById('sortSelect');
 
-      function render(cards) {
+      function render(displayArray) {
         listEl.innerHTML = '';
-        cards.forEach((c, i) => {
+        displayArray.forEach(item => {
           const div = document.createElement('div');
           div.className = 'flashcard-item';
-          div.innerHTML = `<h3>${c.question}</h3><p>${c.answer}</p>`;
+          // carry through original index in dataset
+          div.dataset.originalIndex = item.idx;
+          div.innerHTML = `
+            <div class="card-content">
+              <h3 class="q-text">${item.question}</h3>
+              <p class="a-text">${item.answer}</p>
+            </div>
+            <div class="item-buttons">
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </div>
+          `;
           listEl.appendChild(div);
         });
+        attachItemEvents();
       }
 
       function sortAndRender() {
+        // attach original index
+        let withIndex = flashcards.map((c, i) => ({ ...c, idx: i }));
         const mode = sortEl.value;
-        let sorted = [...flashcards];
 
         if (mode === 'question') {
-          sorted.sort((a, b) => a.question.localeCompare(b.question));
+          withIndex.sort((a, b) => a.question.localeCompare(b.question));
         } else if (mode === 'custom') {
-          // assume you’ve been updating position in localStorage if you allow reordering
-          sorted.sort((a, b) => (a.position || 0) - (b.position || 0));
+          withIndex.sort((a, b) => (a.position||0) - (b.position||0));
         } else {
-          // date: newest first (we saved no timestamp in localStorage, so fall back to insertion order)
-          sorted = flashcards.slice().reverse();
+          // date: newest first => reverse original order
+          withIndex = withIndex.slice().reverse();
         }
 
-        render(sorted);
+        render(withIndex);
+      }
+
+      function attachItemEvents() {
+        // Delete
+        listEl.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const orig = +btn.closest('.flashcard-item').dataset.originalIndex;
+            flashcards.splice(orig, 1);
+            saveAndRefresh();
+          });
+        });
+
+        // Edit (inline)
+        listEl.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const itemDiv = btn.closest('.flashcard-item');
+            const orig    = +itemDiv.dataset.originalIndex;
+            enterEditMode(itemDiv, orig);
+          });
+        });
+      }
+
+      function enterEditMode(itemDiv, orig) {
+        const q = flashcards[orig].question;
+        const a = flashcards[orig].answer;
+
+        // swap in inputs
+        itemDiv.querySelector('.card-content').innerHTML = `
+          <input class="edit-q" value="${q}" style="width:100%; margin-bottom:.5rem;"/>
+          <input class="edit-a" value="${a}" style="width:100%;"/>
+        `;
+
+        // swap buttons
+        const btns = itemDiv.querySelector('.item-buttons');
+        btns.innerHTML = `
+          <button class="save-btn">Save</button>
+          <button class="cancel-btn">Cancel</button>
+        `;
+
+        // Save
+        btns.querySelector('.save-btn').addEventListener('click', () => {
+          const newQ = itemDiv.querySelector('.edit-q').value.trim();
+          const newA = itemDiv.querySelector('.edit-a').value.trim();
+          if (!newQ || !newA) return;
+          flashcards[orig].question = newQ;
+          flashcards[orig].answer   = newA;
+          saveAndRefresh();
+        });
+
+        // Cancel
+        btns.querySelector('.cancel-btn').addEventListener('click', () => {
+          sortAndRender();
+        });
+      }
+
+      function saveAndRefresh() {
+        localStorage.setItem('flashcards', JSON.stringify(flashcards));
+        sortAndRender();
       }
 
       sortEl.addEventListener('change', sortAndRender);

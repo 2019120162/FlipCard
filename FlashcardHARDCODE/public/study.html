@@ -8,62 +8,68 @@
 </head>
 <body>
   <div class="container">
-    <h2>Study Mode</h2>
-    <div class="flashcard">
-      <div class="card-inner" id="cardInner">
-        <div class="card-front" id="cardFront"></div>
-        <div class="card-back" id="cardBack"></div>
+    
+  
+    <div class="study-wrapper">
+      <button id="prevBtn" class="arrow-button">&#8592;</button>
+  
+      <div class="flashcard" id="flashcard">
+        <div class="card-inner" id="cardInner">
+          <div class="card-front" id="cardFront"></div>
+          <div class="card-back" id="cardBack"></div>
+        </div>
       </div>
+  
+      <button id="nextBtn" class="arrow-button">&#8594;</button>
     </div>
-    <div class="buttons">
-      <button id="prevBtn">Previous</button>
-      <button id="flipBtn">Flip</button>
-      <button id="nextBtn">Next</button>
-    </div>
+  
     <div style="margin-top: 1rem;">
       <a href="index.html">Back to Home</a>
     </div>
   </div>
-
+  
   <script>
     const flashcards = JSON.parse(localStorage.getItem("flashcards")) || [
       { question: "What is TCP?", answer: "Transmission Control Protocol" },
       { question: "What is UDP?", answer: "User Datagram Protocol" },
       { question: "What does HTTP stand for?", answer: "HyperText Transfer Protocol" },
     ];
-
+  
     let currentIndex = 0;
-    let flipped = false;
-
+  
     const card = document.querySelector(".flashcard");
+    const cardInner = document.getElementById("cardInner");
     const front = document.getElementById("cardFront");
     const back = document.getElementById("cardBack");
-    const cardInner = document.getElementById("cardInner");
-
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+  
     function showCard(index) {
-      front.textContent = flashcards[index].question;
-      back.textContent = flashcards[index].answer;
-      flipped = false;
+      const cardData = flashcards[index];
+      front.textContent = cardData.question;
+      back.textContent = cardData.answer;
       card.classList.remove("flipped");
     }
-
-    document.getElementById("flipBtn").addEventListener("click", () => {
-      flipped = !flipped;
+  
+    card.addEventListener("click", () => {
       card.classList.toggle("flipped");
     });
-
-    document.getElementById("nextBtn").addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % flashcards.length;
-      showCard(currentIndex);
-    });
-
-    document.getElementById("prevBtn").addEventListener("click", () => {
+  
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent card flip when clicking nav
       currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
       showCard(currentIndex);
     });
-
+  
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent card flip when clicking nav
+      currentIndex = (currentIndex + 1) % flashcards.length;
+      showCard(currentIndex);
+    });
+  
     // Initialize
     showCard(currentIndex);
   </script>
+  
 </body>
 </html>

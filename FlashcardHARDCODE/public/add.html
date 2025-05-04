@@ -1,3 +1,4 @@
+<!-- add.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +29,7 @@
   <script>
     const form = document.getElementById('addForm');
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const question = document.getElementById('question').value.trim();
@@ -36,12 +37,23 @@
 
       if (!question || !answer) return;
 
-      const flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
-      flashcards.push({ question, answer });
-      localStorage.setItem('flashcards', JSON.stringify(flashcards));
+      try {
+        const res = await fetch('/api/flashcards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, answer }),
+        });
 
-      alert('Flashcard added successfully!');
-      form.reset();
+        if (res.ok) {
+          alert('Flashcard added successfully!');
+          form.reset();
+        } else {
+          alert('Failed to add flashcard.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Error while adding flashcard');
+      }
     });
   </script>
 </body>

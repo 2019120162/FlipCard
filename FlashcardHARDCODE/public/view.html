@@ -1,3 +1,4 @@
+<!-- view.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +16,6 @@
       <select id="sortSelect">
         <option value="date">Date Added</option>
         <option value="question">Question (A-Z)</option>
-        <option value="custom">Custom Order</option>
       </select>
     </div>
 
@@ -27,112 +27,36 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // load base array
-      let flashcards = JSON.parse(localStorage.getItem('flashcards')) || [];
+    document.addEventListener('DOMContentLoaded', async () => {
+      const listEl = document.getElementById('flashcardList');
+      const sortEl = document.getElementById('sortSelect');
 
-      const listEl   = document.getElementById('flashcardList');
-      const sortEl   = document.getElementById('sortSelect');
+      async function loadCards(sort = 'date') {
+        const res = await fetch(`/api/flashcards?sort=${sort}`);
+        const cards = await res.json();
+        renderList(cards);
+      }
 
-      function render(displayArray) {
+      function renderList(cards) {
         listEl.innerHTML = '';
-        displayArray.forEach(item => {
+        cards.forEach((card) => {
           const div = document.createElement('div');
           div.className = 'flashcard-item';
-          // carry through original index in dataset
-          div.dataset.originalIndex = item.idx;
           div.innerHTML = `
             <div class="card-content">
-              <h3 class="q-text">${item.question}</h3>
-              <p class="a-text">${item.answer}</p>
-            </div>
-            <div class="item-buttons">
-              <button class="edit-btn">Edit</button>
-              <button class="delete-btn">Delete</button>
+              <h3 class="q-text">${card.question}</h3>
+              <p class="a-text">${card.answer}</p>
             </div>
           `;
           listEl.appendChild(div);
         });
-        attachItemEvents();
       }
 
-      function sortAndRender() {
-        // attach original index
-        let withIndex = flashcards.map((c, i) => ({ ...c, idx: i }));
-        const mode = sortEl.value;
+      sortEl.addEventListener('change', (e) => {
+        loadCards(e.target.value);
+      });
 
-        if (mode === 'question') {
-          withIndex.sort((a, b) => a.question.localeCompare(b.question));
-        } else if (mode === 'custom') {
-          withIndex.sort((a, b) => (a.position||0) - (b.position||0));
-        } else {
-          // date: newest first => reverse original order
-          withIndex = withIndex.slice().reverse();
-        }
-
-        render(withIndex);
-      }
-
-      function attachItemEvents() {
-        // Delete
-        listEl.querySelectorAll('.delete-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const orig = +btn.closest('.flashcard-item').dataset.originalIndex;
-            flashcards.splice(orig, 1);
-            saveAndRefresh();
-          });
-        });
-
-        // Edit (inline)
-        listEl.querySelectorAll('.edit-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const itemDiv = btn.closest('.flashcard-item');
-            const orig    = +itemDiv.dataset.originalIndex;
-            enterEditMode(itemDiv, orig);
-          });
-        });
-      }
-
-      function enterEditMode(itemDiv, orig) {
-        const q = flashcards[orig].question;
-        const a = flashcards[orig].answer;
-
-        // swap in inputs
-        itemDiv.querySelector('.card-content').innerHTML = `
-          <input class="edit-q" value="${q}" style="width:100%; margin-bottom:.5rem;"/>
-          <input class="edit-a" value="${a}" style="width:100%;"/>
-        `;
-
-        // swap buttons
-        const btns = itemDiv.querySelector('.item-buttons');
-        btns.innerHTML = `
-          <button class="save-btn">Save</button>
-          <button class="cancel-btn">Cancel</button>
-        `;
-
-        // Save
-        btns.querySelector('.save-btn').addEventListener('click', () => {
-          const newQ = itemDiv.querySelector('.edit-q').value.trim();
-          const newA = itemDiv.querySelector('.edit-a').value.trim();
-          if (!newQ || !newA) return;
-          flashcards[orig].question = newQ;
-          flashcards[orig].answer   = newA;
-          saveAndRefresh();
-        });
-
-        // Cancel
-        btns.querySelector('.cancel-btn').addEventListener('click', () => {
-          sortAndRender();
-        });
-      }
-
-      function saveAndRefresh() {
-        localStorage.setItem('flashcards', JSON.stringify(flashcards));
-        sortAndRender();
-      }
-
-      sortEl.addEventListener('change', sortAndRender);
-      sortAndRender();
+      loadCards();
     });
   </script>
 </body>

@@ -1,0 +1,105 @@
+<!-- view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Flashcard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Add New Flashcard</h2>
+
+    <form id="flashcardForm">
+      <div class="form-group">
+        <label for="question">Question:</label>
+        <input type="text" id="question" name="question" placeholder="Enter your question">
+        <span id="questionError" class="error-message"></span> <!-- Error message for question -->
+      </div>
+
+      <div class="form-group">
+        <label for="answer">Answer:</label>
+        <input type="text" id="answer" name="answer" placeholder="Enter your answer">
+        <span id="answerError" class="error-message"></span> <!-- Error message for answer -->
+      </div>
+
+      <button type="submit">Add Flashcard</button>
+    </form>
+
+    <div style="margin-top: 1.5rem;">
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('flashcardForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const questionInput = document.getElementById('question');
+      const answerInput = document.getElementById('answer');
+      const questionError = document.getElementById('questionError');
+      const answerError = document.getElementById('answerError');
+      
+      // Reset previous error states
+      questionError.textContent = '';
+      answerError.textContent = '';
+      questionInput.style.borderColor = '';
+      answerInput.style.borderColor = '';
+
+      // Get values from inputs
+      const question = questionInput.value.trim();
+      const answer = answerInput.value.trim();
+
+      let valid = true;
+
+// Question validation
+if (!question) {
+  valid = false;
+  questionError.textContent = 'Question cannot be empty.';
+  questionInput.style.borderColor = 'red';
+} else if (question.length < 3) {
+  valid = false;
+  questionError.textContent = 'Question must be at least 3 characters.';
+  questionInput.style.borderColor = 'red';
+}
+
+// Answer validation
+if (!answer) {
+  valid = false;
+  answerError.textContent = 'Answer cannot be empty.';
+  answerInput.style.borderColor = 'red';
+}
+
+      if (!valid) return;
+
+      // If valid, send data to server
+      const response = await fetch('/api/flashcards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, answer }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Redirect or display success
+        alert('Flashcard added successfully!');
+        window.location.href = 'view.html'; // Redirect to view page
+      } else {
+        // Show server-side validation errors
+        if (data.error) {
+          if (data.error.includes('question')) {
+            questionError.textContent = data.error;
+            questionInput.style.borderColor = 'red';
+          }
+          if (data.error.includes('answer')) {
+            answerError.textContent = data.error;
+            answerInput.style.borderColor = 'red';
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

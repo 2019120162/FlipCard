@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Flashcards</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    
+  
+    <div class="study-wrapper">
+      <button id="prevBtn" class="arrow-button">&#8592;</button>
+  
+      <div class="flashcard" id="flashcard">
+        <div class="card-inner" id="cardInner">
+          <div class="card-front" id="cardFront"></div>
+          <div class="card-back" id="cardBack"></div>
+        </div>
+      </div>
+  
+      <button id="nextBtn" class="arrow-button">&#8594;</button>
+    </div>
+  
+    <div style="margin-top: 1rem;">
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+  
+  <script>
+    let flashcards = [];
+    let currentIndex = 0;
+  
+    const card = document.querySelector(".flashcard");
+    const cardInner = document.getElementById("cardInner");
+    const front = document.getElementById("cardFront");
+    const back = document.getElementById("cardBack");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+  
+    async function loadFlashcards() {
+      try {
+        const res = await fetch('/api/flashcards');
+        flashcards = await res.json();
+  
+        if (flashcards.length === 0) {
+          front.textContent = "No flashcards found.";
+          back.textContent = "Go add some first!";
+        } else {
+          showCard(currentIndex);
+        }
+      } catch (err) {
+        console.error('Error loading flashcards:', err);
+      }
+    }
+  
+    function showCard(index) {
+      const cardData = flashcards[index];
+      front.textContent = cardData.question;
+      back.textContent = cardData.answer;
+      card.classList.remove("flipped");
+    }
+  
+    card.addEventListener("click", () => {
+      card.classList.toggle("flipped");
+    });
+  
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      showCard(currentIndex);
+    });
+  
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      currentIndex = (currentIndex + 1) % flashcards.length;
+      showCard(currentIndex);
+    });
+  
+    // Load flashcards from server
+    loadFlashcards();
+  </script>
+  
+  
+</body>
+</html>
